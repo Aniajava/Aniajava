@@ -29,7 +29,7 @@ public class Partie extends Puissance{
             Grille[i][IdColonne] = Jeton;
         }
     }
-
+//Afficher Partie
     public void AfficherPartie(){
         int lignes = 2*hauteur +2;
         int colonnes = 2*largeur +1;
