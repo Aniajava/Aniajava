@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Jeu extends Partie{
@@ -8,7 +9,13 @@ public class Jeu extends Partie{
     public static Partie InitialisationPartie() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Combien de joueur humain ?");
-        int nbHumain = sc.nextInt();
+        int nbHumain;
+        try {
+            nbHumain = sc.nextInt();
+        }catch(InputMismatchException e){
+            System.out.println("Veuillez saisir un nombre :");
+            return InitialisationPartie();
+        }
         String pseudo1 ;
         String pseudo2 ;
         switch (nbHumain) {
@@ -34,14 +41,13 @@ public class Jeu extends Partie{
     }
     public static Partie LancementPartie(){
         Partie p = null;
-        File monFichier = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_jeu.txt");
+        File monFichier = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/Sauvegarde_jeu.txt");
         if(monFichier.exists()){
             Scanner sc = new Scanner(System.in);
             System.out.println("Voulez vous reprendre la partie précédente ? O/N");
             String r = sc.nextLine();
             if(r.equals("O")){
-                p = Charge();
-                p.AfficherPartie();
+                p = Charge("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/Sauvegarde_jeu.txt");
             }else if(r.equals("N")){
                 p = InitialisationPartie();
             }else{
@@ -54,6 +60,10 @@ public class Jeu extends Partie{
         }
         return p;
     }
+
+   // public static Partie LancementPartieBis(){}
+
+
     public static int[] MaJPartie(Partie p,Joueur J){
         int[] coordonnées = null;
         Scanner sc = new Scanner(System.in);
@@ -73,7 +83,7 @@ public class Jeu extends Partie{
             catch (NumberFormatException ex){
                 if (str.equals("exit")){
                     end = 1;
-                    Sauvegarde(p);
+                    Sauvegarde(p,"/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/Sauvegarde_jeu.txt");
                 }
                 else{
                     System.out.println("La colonne demandée est invalide, réessayez une autre :");
@@ -88,9 +98,9 @@ public class Jeu extends Partie{
         return coordonnées;
     }
 
-    public static void Sauvegarde(Partie p){
+    public static void Sauvegarde(Partie p,String adresse){
         try{
-            FileOutputStream fos = new FileOutputStream("/Users/thibautmaurel/Documents/Projet/Sauvegarde_jeu.txt");
+            FileOutputStream fos = new FileOutputStream(adresse);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(p);
             os.close();
@@ -98,9 +108,10 @@ public class Jeu extends Partie{
             e.printStackTrace();
         }
     }
-    public static Partie Charge(){
+
+    public static Partie Charge(String adresse){
         try {
-            FileInputStream fis = new FileInputStream("/Users/thibautmaurel/Documents/Projet/Sauvegarde_jeu.txt");
+            FileInputStream fis = new FileInputStream(adresse);
             ObjectInputStream ois = new ObjectInputStream(fis);
             Partie p = (Partie) ois.readObject();
             return p;
