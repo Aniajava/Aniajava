@@ -3,13 +3,14 @@ import java.net.ConnectException;
 import java.util.Scanner;
 
 public class Joueur_compte extends Joueur implements Serializable {
+    private static final long serialVersionUID = 6368595323281647196L;
     String MotDePasse;
     File Dossier;
 
     public Joueur_compte(String pseudo,char Jeton,String MotDePasse){
         super(pseudo,Jeton);
         this.MotDePasse = MotDePasse;
-        File dossier = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie"+pseudo);
+        File dossier = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+pseudo);
     }
 
     public static Joueur_compte ChargeCompte(String adresse){
@@ -48,6 +49,7 @@ public class Joueur_compte extends Joueur implements Serializable {
         SauvegardeCompte(J,"/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/"+pseudo+".txt");
         File f = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+pseudo);
         f.mkdir();
+        System.out.println("Votre compte a été créé !");
         return J;
     }
 
@@ -58,10 +60,9 @@ public class Joueur_compte extends Joueur implements Serializable {
         sc = new Scanner(System.in);
         String reponse = sc.nextLine();
         if (reponse.equals("O")) {
-            System.out.println("Votre compte a été créé !");
             return CreationCompte();
         } else if (reponse.equals("N")) {
-            return ConnexionCompte();
+            return null;
         } else {
             System.out.println("Réponse invalide");
             return CreationComptebis();
@@ -83,7 +84,7 @@ public class Joueur_compte extends Joueur implements Serializable {
         // Ou est censé se trouver se dossier, ensuite F.exist() vérifie qu'il y ait bien un dossier à cette adresse
         // donc qu'il y ait bien un compte de créer
         if(F.exists() && F.isDirectory()){
-            J = ChargeCompte("/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/"+pseudo);
+            J = ChargeCompte("/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/"+pseudo+".txt");
             if(J.MotDePasse.equals(MotDePasse)){
                 System.out.println("Vous êtes connectés !");
                 return J;
@@ -96,5 +97,9 @@ public class Joueur_compte extends Joueur implements Serializable {
         else{
                 return CreationComptebis();
         }
+    }
+
+    public String toString(){
+        return IdJoueur + MotDePasse;
     }
 }

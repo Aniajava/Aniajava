@@ -6,6 +6,7 @@ public class Jeu extends Partie{
 
     public static int end = 0;
 
+    // Initialise la partie : Nombre de Joueur / Mise en place de la Grille / ...
     public static Partie InitialisationPartie() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Combien de joueur humain ?");
@@ -39,6 +40,8 @@ public class Jeu extends Partie{
                 return InitialisationPartie();
         }
     }
+
+    // Initialisation avec l'ajout de la sauvegarde de la dernière partie joué sans connection
     public static Partie LancementPartie(){
         Partie p = null;
         File monFichier = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/Sauvegarde_jeu.txt");
@@ -61,7 +64,52 @@ public class Jeu extends Partie{
         return p;
     }
 
-   // public static Partie LancementPartieBis(){}
+    public static void showFiles(File[] files) {
+        for (File file : files) {
+            if (file.isFile()) {
+                System.out.println("File: " + file.getName());
+            }
+        }
+    }
+
+    // Retourne la partie chargé souhaité par le joueur
+    public static Partie chargementPartie(Joueur_compte J){
+        Partie p = null;
+        if(J == null){
+            return LancementPartie();
+        }
+        else{
+            File[] files = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+J.IdJoueur).listFiles();
+            if(files.length == 0){
+                return LancementPartie();
+            }
+            else{
+                showFiles(files);
+                System.out.println("Quel partie voulez vous lancer ?");
+                Scanner sc = new Scanner(System.in);
+                String reponse = sc.nextLine();
+                try {
+                    p = Charge("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/" + J.IdJoueur + "/" + reponse);
+                }catch (GameNotFoundException e){
+                    System.out.println("Le fichier n'existe pas, veuillez reessayer !");
+                    p = chargementPartie(J);
+                }
+            }
+        }
+        return p;
+    }
+
+// Ajout de la connection à un compte
+   public static Partie LancementPartieBis(){
+        System.out.println("Voulez vous vous connecter ? O/N");
+        Scanner sc = new Scanner(System.in);
+        String reponse = sc.nextLine();
+        switch (reponse){
+            case "N": return LancementPartie();
+            case "O": Joueur_compte J = Joueur_compte.ConnexionCompte();return chargementPartie(J);
+            default: System.out.println("Réponse invalide");return LancementPartieBis();
+        }
+   }
 
 
     public static int[] MaJPartie(Partie p,Joueur J){
@@ -109,22 +157,32 @@ public class Jeu extends Partie{
         }
     }
 
-    public static Partie Charge(String adresse){
+    public static Partie Charge(String adresse) {
         try {
+            File f = new File(adresse);
             FileInputStream fis = new FileInputStream(adresse);
             ObjectInputStream ois = new ObjectInputStream(fis);
             Partie p = (Partie) ois.readObject();
             return p;
-        }catch (Exception e){
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new GameNotFoundException(adresse);
         }
-        return null;
     }
 
+    public static void Fin(Partie p,Joueur J){
+        if(p.victoire == 1 && end == 0) {
+            System.out.println("Le Joueur : " + J.IdJoueur + " à gagné !");
+        }
+        else if(end == 0){
+            System.out.println("Match nul");
+        }else{
+            System.out.println("A très vite !");
+        }
+    }
 
     public static void main(String args[]) {
         Partie p = null;
-        p = LancementPartie();
+        p = LancementPartieBis();
         Joueur J = new Joueur(p.Joueur1.IdJoueur, p.Joueur1.Type, p.Joueur1.Jeton);
         int Indice = 1;
         int[] coordonnées = {11, 7};
@@ -147,13 +205,6 @@ public class Jeu extends Partie{
                 Indice *= -1;
             }
         }
-        if(p.victoire == 1 && end == 0) {
-            System.out.println("Le Joueur : " + J.IdJoueur + " à gagné !");
-        }
-        else if(end == 0){
-            System.out.println("Match nul");
-        }else{
-            System.out.println("A très vite !");
-        }
+        Fin(p,J);
     }
 }
