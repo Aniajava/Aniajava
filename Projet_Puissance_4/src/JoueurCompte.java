@@ -10,8 +10,11 @@ public class JoueurCompte extends Joueur implements Serializable {
     public JoueurCompte(String pseudo,char Jeton,String MotDePasse){
         super(pseudo,Jeton);
         this.MotDePasse = MotDePasse;
-        adresse = "/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+pseudo;
-        File dossier = new File(adresse);
+        File f = new File("./Sauvegarde_partie");
+        if (!f.isDirectory()) {
+            f.mkdir();
+        }
+        adresse = "./Sauvegarde_partie/" + pseudo;
     }
 
     public static JoueurCompte ChargeCompte(String adresse){
@@ -46,11 +49,15 @@ public class JoueurCompte extends Joueur implements Serializable {
         // Récupère le mot de passe
         String MotDePasse = sc.nextLine();
         // Création du compte s'il n'existe pas déjà
-        File test = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/"+pseudo+".txt");
-        if(test.exists() == false) {
+        File test = new File("./Sauvegarde_joueur");
+        if(!test.isDirectory()){
+            test.mkdir();
+        }
+        test = new File("./Sauvegarde_joueur/"+pseudo+".txt");
+        if(!test.exists()) {
             J = new JoueurCompte(pseudo, 'X', MotDePasse);
-            SauvegardeCompte(J, "/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/" + pseudo + ".txt");
-            File f = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/" + pseudo);
+            SauvegardeCompte(J, "./Sauvegarde_joueur/" + pseudo + ".txt");
+            File f = new File("./Sauvegarde_partie/" + pseudo);
             f.mkdir();
             System.out.println("Votre compte a été créé !");
             Jeu.connecte = 1;
@@ -86,12 +93,12 @@ public class JoueurCompte extends Joueur implements Serializable {
         // Récupère le mot de passe
         String MotDePasse = sc.nextLine();
         JoueurCompte J;
-        File F = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+pseudo);
+        File F = new File("./Sauvegarde_partie/"+pseudo);
         // Chaque Joueur à un dossier créé lors de la création de son compte , ici File f est l'adresse
         // Ou est censé se trouver se dossier, ensuite F.exist() vérifie qu'il y ait bien un dossier à cette adresse
         // donc qu'il y ait bien un compte de créer
         if(F.exists() && F.isDirectory()){
-            J = ChargeCompte("/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/"+pseudo+".txt");
+            J = ChargeCompte("./Sauvegarde_joueur/"+pseudo+".txt");
             if(J.MotDePasse.equals(MotDePasse)){
                 System.out.println("Vous êtes connectés !");
                 Jeu.connecte = 1;

@@ -162,7 +162,7 @@ public class Partie extends Puissance implements Serializable {
             return lancementPartie();
         }
         else{
-            File[] files = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+J.IdJoueur).listFiles();
+            File[] files = new File("./Sauvegarde_partie/"+J.IdJoueur).listFiles();
             if(files.length == 0){
                 return initialisationPartie();
             }
@@ -172,7 +172,7 @@ public class Partie extends Puissance implements Serializable {
                 Scanner sc = new Scanner(System.in);
                 String reponse = sc.nextLine();
                 try {
-                    p = charge("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/" + J.IdJoueur + "/" + reponse);
+                    p = charge("./Sauvegarde_partie/" + J.IdJoueur + "/" + reponse);
                 }catch (GameNotFoundException e){
                     System.out.println("Le fichier n'existe pas, veuillez reessayer !");
                     p = chargementPartie(J);
