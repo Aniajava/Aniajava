@@ -1,30 +1,31 @@
 import java.io.*;
-import java.net.ConnectException;
 import java.util.Scanner;
 
-public class Joueur_compte extends Joueur implements Serializable {
+public class JoueurCompte extends Joueur implements Serializable {
     private static final long serialVersionUID = 6368595323281647196L;
     String MotDePasse;
     File Dossier;
+    String adresse;
 
-    public Joueur_compte(String pseudo,char Jeton,String MotDePasse){
+    public JoueurCompte(String pseudo,char Jeton,String MotDePasse){
         super(pseudo,Jeton);
         this.MotDePasse = MotDePasse;
-        File dossier = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+pseudo);
+        adresse = "/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+pseudo;
+        File dossier = new File(adresse);
     }
 
-    public static Joueur_compte ChargeCompte(String adresse){
+    public static JoueurCompte ChargeCompte(String adresse){
         try {
             FileInputStream fis = new FileInputStream(adresse);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            Joueur_compte J = (Joueur_compte) ois.readObject();
+            JoueurCompte J = (JoueurCompte) ois.readObject();
             return J;
         }catch (Exception e){
             e.printStackTrace();
         }
         return null;
     }
-    public static void SauvegardeCompte(Joueur_compte J,String adresse){
+    public static void SauvegardeCompte(JoueurCompte J, String adresse){
         try{
             FileOutputStream fos = new FileOutputStream(adresse);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -34,8 +35,8 @@ public class Joueur_compte extends Joueur implements Serializable {
             e.printStackTrace();
         }
     }
-
-    public static Joueur_compte CreationCompte(){
+    public static JoueurCompte CreationCompte(){
+        JoueurCompte J = null;
         System.out.println("Choisissez votre pseudo : ");
         Scanner sc = new Scanner(System.in);
         // Récupère l'identifiant
@@ -44,17 +45,24 @@ public class Joueur_compte extends Joueur implements Serializable {
         sc = new Scanner(System.in);
         // Récupère le mot de passe
         String MotDePasse = sc.nextLine();
-        // Création du compte
-        Joueur_compte J = new Joueur_compte(pseudo,'X',MotDePasse);
-        SauvegardeCompte(J,"/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/"+pseudo+".txt");
-        File f = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+pseudo);
-        f.mkdir();
-        System.out.println("Votre compte a été créé !");
+        // Création du compte s'il n'existe pas déjà
+        File test = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/"+pseudo+".txt");
+        if(test.exists() == false) {
+            J = new JoueurCompte(pseudo, 'X', MotDePasse);
+            SauvegardeCompte(J, "/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/" + pseudo + ".txt");
+            File f = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/" + pseudo);
+            f.mkdir();
+            System.out.println("Votre compte a été créé !");
+            Jeu.connecte = 1;
+        }
+        else{
+            System.out.println("Ce nom de compte est déjà pris, veuillez en choisir un autre : ");
+            J = CreationCompte();
+        }
         return J;
     }
-
     // On a créé Creation Compte bis pour la méthode Connexion Compte pour pouvoir relancer la méthode si la réponse est incorect
-    public static Joueur_compte CreationComptebis() {
+    public static JoueurCompte CreationComptebis() {
         Scanner sc;
         System.out.println("Le Compte n'existe pas, voulez vous en créer un ? O/N");
         sc = new Scanner(System.in);
@@ -68,8 +76,7 @@ public class Joueur_compte extends Joueur implements Serializable {
             return CreationComptebis();
         }
     }
-
-    public static Joueur_compte ConnexionCompte(){
+    public static JoueurCompte ConnexionCompte(){
         System.out.println("Quel est votre pseudo ?");
         Scanner sc = new Scanner(System.in);
         // Récupère l'identifiant
@@ -78,7 +85,7 @@ public class Joueur_compte extends Joueur implements Serializable {
         sc = new Scanner(System.in);
         // Récupère le mot de passe
         String MotDePasse = sc.nextLine();
-        Joueur_compte J;
+        JoueurCompte J;
         File F = new File("/Users/thibautmaurel/Documents/Projet/Sauvegarde_partie/"+pseudo);
         // Chaque Joueur à un dossier créé lors de la création de son compte , ici File f est l'adresse
         // Ou est censé se trouver se dossier, ensuite F.exist() vérifie qu'il y ait bien un dossier à cette adresse
@@ -87,6 +94,7 @@ public class Joueur_compte extends Joueur implements Serializable {
             J = ChargeCompte("/Users/thibautmaurel/Documents/Projet/Sauvegarde_joueur/"+pseudo+".txt");
             if(J.MotDePasse.equals(MotDePasse)){
                 System.out.println("Vous êtes connectés !");
+                Jeu.connecte = 1;
                 return J;
             }
             else{
@@ -95,11 +103,21 @@ public class Joueur_compte extends Joueur implements Serializable {
             }
         }
         else{
-                return CreationComptebis();
+            return CreationComptebis();
         }
     }
 
+    public static JoueurCompte CreationConnexionCompte(){
+        System.out.println("Avez vous déjà un compte ? O/N");
+        Scanner sc = new Scanner(System.in);
+        String reponse = sc.nextLine();
+        switch (reponse){
+            case "O": return JoueurCompte.ConnexionCompte();
+            case "N": return JoueurCompte.CreationCompte();
+            default: System.out.println("Réponse invalide :");return CreationConnexionCompte();
+        }
+    }
     public String toString(){
-        return IdJoueur + MotDePasse;
+        return adresse;
     }
 }
