@@ -294,6 +294,4 @@ public class Partie extends Puissance implements Serializable {
         }
         return J;
     }
-
-
 }
